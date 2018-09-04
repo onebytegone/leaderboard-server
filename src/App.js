@@ -18,6 +18,7 @@ module.exports = Class.extend({
    startServer: function(port) {
       console.log('starting server on port %d', port);
       this.app = express();
+      this.app.use(express.json());
 
       this.app.get('/ping', function(req, res) {
          res.send(JSON.stringify({ pong: new Date() }));

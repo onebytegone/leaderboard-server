@@ -2,35 +2,57 @@
 
 var _ = require('underscore'),
     Q = require('q'),
-    BaseModel = require('./BaseModel');
+    uuid = require('uuid/v4'),
+    BaseModel = require('./BaseModel'),
+    NameGenerator = require('./../lib/NameGenerator');
 
 module.exports = BaseModel.extend({
 
-   saveGame: function() {
-      return Q.when();
+   saveGame: function(game) {
+      var nameGenerator = new NameGenerator();
+
+      if (!_.isObject(game)) {
+         return Q.reject({ message: 'The provided game must be an object' });
+      }
+
+      if (!_.isArray(game.players)) {
+         return Q.reject({ message: 'A game must have an array of `players`' });
+      }
+
+      if (_.isEmpty(game.players)) {
+         return Q.reject({ message: 'There must be at least one player in the array of `players`' });
+      }
+
+      if (!game.id) {
+         game.id = uuid();
+      }
+
+      if (!game.timestamp) {
+         game.timestamp = Date.now();
+      }
+
+      _.each(game.players, function(player) {
+         if (!player.name) {
+            player.name = nameGenerator.generateName();
+         }
+      });
+
+      console.log('DEBUG saving game: %j', game);
+
+      return this.persistor.put('games', game.id, game);
    },
 
    list: function(limit) {
-      var games;
+      return this.persistor.get('games')
+         .then(function(games) {
+            games = _.sortBy(games, 'timestamp').reverse();
 
-      games = [
-         {
-            id: 'aaaa-aaa',
-            timestamp: '1970-02-02T04:24',
-            players: [
-               {
-                  name: 'bob',
-                  score: 5,
-               },
-            ],
-         },
-      ];
+            if (limit) {
+               games = _.first(games, limit);
+            }
 
-      if (limit) {
-         games = _.first(games, limit);
-      }
-
-      return Q.when(games);
+            return games;
+         });
    },
 
 });
