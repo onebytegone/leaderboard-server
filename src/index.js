@@ -3,4 +3,4 @@
 var App = require('./App'),
     app = new App();
 
-app.sayHello();
+app.startServer(3000);
