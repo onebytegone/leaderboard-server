@@ -1,0 +1,11 @@
+{
+
+   "extends": "eslint-config-silvermine/node",
+
+   "rules": {
+      "no-console": "off",
+      "no-process-env": "off"
+   }
+
+}
+
