@@ -17,17 +17,18 @@ module.exports = Class.extend({
    },
 
    put: function(hash, range, value) {
-      var currentHash = db.get(hash),
-          obj = {};
+      var currentHash = db.get(hash).value(),
+          newObj = {};
 
       if (!_.isObject(currentHash)) {
-         db.set(hash, {})
+         newObj = db.set(hash, {})
             .write();
       }
 
-      obj[range] = value;
+      newObj[range] = value;
 
-      db.set(hash, obj)
+      db.get(hash)
+         .assign(newObj)
          .write();
 
       return Q.when();
