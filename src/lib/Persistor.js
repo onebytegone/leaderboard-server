@@ -2,35 +2,49 @@
 
 var _ = require('underscore'),
     Q = require('q'),
-    Class = require('class.extend');
+    Class = require('class.extend'),
+    low = require('lowdb'),
+    FileSync = require('lowdb/adapters/FileSync'),
+    adapter, db;
 
 module.exports = Class.extend({
 
    init: function() {
-      // TODO: actually read/write to a file
-      this.inMemoryStorage = {};
+      adapter = new FileSync('./store/db.json');
+      db = low(adapter);
+      db.defaults({})
+         .write();
    },
 
    put: function(hash, range, value) {
-      if (!_.isObject(this.inMemoryStorage[hash])) {
-         this.inMemoryStorage[hash] = {};
+      var currentHash = db.get(hash),
+          obj = {};
+
+      if (!_.isObject(currentHash)) {
+         db.set(hash, {})
+            .write();
       }
 
-      this.inMemoryStorage[hash][range] = value;
+      obj[range] = value;
+
+      db.set(hash, obj)
+         .write();
 
       return Q.when();
    },
 
    get: function(hash, range) {
-      if (_.isUndefined(range)) {
-         return Q.when(this.inMemoryStorage[hash]);
+      var currentHash = db.get(hash).value();
+
+      if (_.isUndefined(currentHash[range])) {
+         return Q.when(currentHash);
       }
 
-      if (!this.inMemoryStorage[hash]) {
+      if (!currentHash) {
          return Q.when();
       }
 
-      return Q.when(this.inMemoryStorage[hash][range]);
+      return Q.when(currentHash[range]);
    },
 
 });
