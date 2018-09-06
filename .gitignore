@@ -20,3 +20,9 @@ node_modules
 # OS
 .DS_Store
 .tmp
+
+# node version manager
+.nvmrc
+
+# JSON data store
+store/*.json
