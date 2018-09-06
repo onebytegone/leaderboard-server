@@ -4,47 +4,50 @@ var _ = require('underscore'),
     Q = require('q'),
     Class = require('class.extend'),
     low = require('lowdb'),
-    FileSync = require('lowdb/adapters/FileSync'),
-    adapter, db;
+    FileSync = require('lowdb/adapters/FileSync');
 
 module.exports = Class.extend({
 
    init: function() {
-      adapter = new FileSync('./store/db.json');
-      db = low(adapter);
-      db.defaults({})
+      this.adapter = new FileSync('./store/db.json');
+      this.db = low(this.adapter);
+      this.db.defaults({})
          .write();
    },
 
    put: function(hash, range, value) {
-      var currentHash = db.get(hash),
-          obj = {};
+      var currentHash = this.db.get(hash).value(),
+          newObj = {};
 
       if (!_.isObject(currentHash)) {
-         db.set(hash, {})
+         this.db.set(hash, {})
             .write();
       }
 
-      obj[range] = value;
+      newObj[range] = value;
 
-      db.set(hash, obj)
+      this.db.get(hash)
+         .assign(newObj)
          .write();
 
       return Q.when();
    },
 
    get: function(hash, range) {
-      var currentHash = db.get(hash).value();
+      var currentHash = this.db.get(hash).value(),
+          withRange;
 
-      if (_.isUndefined(currentHash[range])) {
+      withRange = currentHash ? currentHash[range] : null;
+
+      if (withRange) {
+         return Q.when(withRange);
+      }
+
+      if (currentHash) {
          return Q.when(currentHash);
       }
 
-      if (!currentHash) {
-         return Q.when();
-      }
-
-      return Q.when(currentHash[range]);
+      return Q.when();
    },
 
 });
