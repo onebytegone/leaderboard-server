@@ -2,6 +2,7 @@
 
 var Class = require('class.extend'),
     express = require('express'),
+    cors = require('cors'),
     Persistor = require('./lib/Persistor'),
     Games = require('./model/Games'),
     TopScores = require('./model/TopScores');
@@ -19,6 +20,8 @@ module.exports = Class.extend({
       console.log('starting server on port %d', port);
       this.app = express();
       this.app.use(express.json());
+
+      this.app.use(cors());
 
       this.app.get('/ping', function(req, res) {
          res.send(JSON.stringify({ pong: new Date() }));
