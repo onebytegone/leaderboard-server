@@ -27,9 +27,11 @@ module.exports = BaseModel.extend({
          game.id = uuid();
       }
 
-      if (!game.timestamp) {
-         game.timestamp = Date.now();
+      if (!game.timeCreated) {
+         game.timeCreated = Date.now();
       }
+
+      game.timeUpdated = Date.now();
 
       _.each(game.players, function(player) {
          if (!player.name) {
