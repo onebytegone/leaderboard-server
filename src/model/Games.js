@@ -23,17 +23,15 @@ module.exports = BaseModel.extend({
          return Q.reject({ message: 'There must be at least one player in the array of `players`' });
       }
 
-      if (game.id) {
-         // If the game already has an ID, this is an existing game
-         // and we can capture a timestamp for the time it was updated.
-         game.updatedTimestamp = Date.now();
-      } else {
+      if (!game.id) {
          game.id = uuid();
       }
 
-      if (!game.timestamp) {
-         game.timestamp = Date.now();
+      if (!game.timeCreated) {
+         game.timeCreated = Date.now();
       }
+
+      game.timeUpdated = Date.now();
 
       _.each(game.players, function(player) {
          if (!player.name) {
