@@ -44,10 +44,14 @@ module.exports = BaseModel.extend({
       return this.persistor.put('games', game.id, game);
    },
 
-   list: function(limit) {
+   list: function(limit, filter) {
       return this.persistor.get('games')
          .then(function(games) {
             games = _.sortBy(games, 'timestamp').reverse();
+
+            if (_.isFunction(filter)) {
+               games = _.filter(games, filter);
+            }
 
             if (limit) {
                games = _.first(games, limit);

@@ -36,6 +36,20 @@ module.exports = Class.extend({
             .done();
       }.bind(this));
 
+      this.app.get('/new-games', function(req, res) {
+         var filter;
+
+         filter = function(game) {
+            return game.timeCreated === game.timeUpdated;
+         };
+
+         this.games.list(undefined, filter)
+            .then(function(games) {
+               res.send(JSON.stringify(games));
+            })
+            .done();
+      }.bind(this));
+
       this.app.post('/games', function(req, res) {
          this.games.saveGame(req.body)
             .then(function() {
