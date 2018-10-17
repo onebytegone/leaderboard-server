@@ -1,6 +1,7 @@
 'use strict';
 
-var Class = require('class.extend'),
+var _ = require('underscore'),
+    Class = require('class.extend'),
     express = require('express'),
     cors = require('cors'),
     Persistor = require('./lib/Persistor'),
@@ -44,7 +45,16 @@ module.exports = Class.extend({
       }.bind(this));
 
       this.app.get('/top-scores', function(req, res) {
-         this.topScores.list(10)
+         var limit = 10;
+
+         if (req.query.limit) {
+            limit = parseInt(req.query.limit, 10);
+            if (_.isNaN(limit)) {
+               limit = 10;
+            }
+         }
+
+         this.topScores.list(limit)
             .then(function(topScores) {
                res.send(JSON.stringify(topScores));
             })
