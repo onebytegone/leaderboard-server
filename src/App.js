@@ -55,6 +55,10 @@ module.exports = Class.extend({
             .then(function() {
                res.send(JSON.stringify({ msg: 'success' }));
             })
+            .catch(function(err) {
+               console.log(err);
+               res.send(JSON.stringify({ msg: 'error' }));
+            })
             .done();
       }.bind(this));
 
